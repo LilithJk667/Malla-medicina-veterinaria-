@@ -60,9 +60,7 @@ const malla = {
         nombre: "Producción de rumiantes menores",
         desbloquea: ["Proyecto productivo"]
       },
-      {
-        nombre: "Electivo Elte"
-      },
+      { nombre: "Electivo Elte" },
       {
         nombre: "Evaluación De ciclo inicial"
       }
@@ -118,7 +116,6 @@ const malla = {
 
 const estadoRamos = {};
 const dependencias = {};
-
 const container = document.getElementById("malla");
 
 function crearMalla() {
@@ -146,8 +143,12 @@ function crearMalla() {
         div.className = "ramo bloqueado";
         div.textContent = ramo.nombre;
         div.dataset.nombre = ramo.nombre;
+        div.setAttribute("title", "Requiere prerrequisito");
 
+        // Estado inicial
         estadoRamos[ramo.nombre] = { aprobado: false, elemento: div };
+
+        // Registrar dependencias
         if (ramo.desbloquea) {
           ramo.desbloquea.forEach(destino => {
             if (!dependencias[destino]) dependencias[destino] = [];
@@ -165,15 +166,17 @@ function crearMalla() {
 
     container.appendChild(contenedorAnio);
   }
-guardarProgreso();
 
   desbloquearIniciales();
+  cargarProgreso();
 }
 
 function desbloquearIniciales() {
   for (const nombre in estadoRamos) {
     if (!dependencias[nombre]) {
-      estadoRamos[nombre].elemento.classList.remove("bloqueado");
+      const el = estadoRamos[nombre].elemento;
+      el.classList.remove("bloqueado");
+      el.removeAttribute("title");
     }
   }
 }
@@ -181,43 +184,32 @@ function desbloquearIniciales() {
 function aprobarRamo(nombre) {
   const ramo = estadoRamos[nombre];
 
-  // Si el ramo está aprobado y lo vuelven a presionar → desmarcar
-  if (ramo.aprobado) {
-    ramo.aprobado = false;
-    ramo.elemento.classList.remove("aprobado");
+  // Si está bloqueado, no permitir
+  if (ramo.elemento.classList.contains("bloqueado") && !ramo.aprobado) return;
 
-    // Recalcular todos los ramos que dependían de este
-    for (const [destino, prereqs] of Object.entries(dependencias)) {
-      if (!estadoRamos[destino].aprobado) {
-        const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
-        if (!todosAprobados) {
-          estadoRamos[destino].elemento.classList.add("bloqueado");
-          estadoRamos[destino].elemento.setAttribute("title", "Requiere prerrequisito");
-        }
+  // Alternar estado
+  ramo.aprobado = !ramo.aprobado;
+  ramo.elemento.classList.toggle("aprobado");
+
+  // Recalcular desbloqueos
+  for (const [destino, prereqs] of Object.entries(dependencias)) {
+    const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
+    const destinoRamo = estadoRamos[destino];
+
+    if (todosAprobados) {
+      destinoRamo.elemento.classList.remove("bloqueado");
+      destinoRamo.elemento.removeAttribute("title");
+    } else {
+      if (!destinoRamo.aprobado) {
+        destinoRamo.elemento.classList.add("bloqueado");
+        destinoRamo.elemento.setAttribute("title", "Requiere prerrequisito");
       }
     }
-    return;
   }
 
-  // Si el ramo está bloqueado, no hacer nada
-  if (ramo.elemento.classList.contains("bloqueado")) return;
-
-  // Aprobar el ramo
-  ramo.aprobado = true;
-  ramo.elemento.classList.add("aprobado");
-
-  // Desbloquear ramos que dependan de este (si todos sus prereqs están aprobados)
-  for (const [destino, prereqs] of Object.entries(dependencias)) {
-    if (estadoRamos[destino].aprobado) continue;
-    const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
-    if (todosAprobados) {
-      estadoRamos[destino].elemento.classList.remove("bloqueado");
-      estadoRamos[destino].elemento.removeAttribute("title");
-    }
-  }
+  guardarProgreso();
 }
-// Añadir tooltip si está bloqueado
-div.setAttribute("title", "Requiere prerrequisito");
+
 function guardarProgreso() {
   const aprobados = Object.entries(estadoRamos)
     .filter(([_, info]) => info.aprobado)
@@ -237,21 +229,16 @@ function cargarProgreso() {
     }
   });
 
-  // Luego de marcar los aprobados, desbloquear los que correspondan
+  // Recalcular desbloqueos
   for (const [destino, prereqs] of Object.entries(dependencias)) {
     const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
-    if (todosAprobados && !estadoRamos[destino].aprobado) {
-      estadoRamos[destino].elemento.classList.remove("bloqueado");
-      estadoRamos[destino].elemento.removeAttribute("title");
+    const destinoRamo = estadoRamos[destino];
+
+    if (todosAprobados) {
+      destinoRamo.elemento.classList.remove("bloqueado");
+      destinoRamo.elemento.removeAttribute("title");
     }
   }
 }
-crearMalla();
-if (ramo.desbloquea) {
-  ramo.desbloquea.forEach(destino => {
-    if (!dependencias[destino]) dependencias[destino] = [];
-    dependencias[destino].push(ramo.nombre);
-  });
-}
 
-cargarProgreso();
+crearMalla();
