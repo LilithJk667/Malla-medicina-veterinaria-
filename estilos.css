@@ -18,12 +18,45 @@ h1 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Contenedor principal */
-.contenedor-malla {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+/* Estructura general de la malla */
+.malla-completa {
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* Cada año */
+.anio {
+  background-color: #f3e5f5;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Título del año */
+.anio h2 {
+  margin-bottom: 1rem;
+  color: #7b1fa2;
+}
+
+/* Cada semestre dentro del año */
+.semestre {
+  margin-bottom: 2rem;
+}
+
+/* Título del semestre */
+.semestre h3 {
+  margin-bottom: 1rem;
+  color: #9c27b0;
+}
+
+/* Contenedor de ramos por semestre */
+.ramos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  justify-content: center;
 }
 
 /* Cada ramo */
@@ -31,14 +64,13 @@ h1 {
   background-color: #fce4ec;
   border: 2px solid #ba68c8;
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.75rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Hover */
 .ramo:hover {
   background-color: #f8bbd0;
   transform: scale(1.05);
@@ -48,5 +80,16 @@ h1 {
 .aprobado {
   background-color: #c5e1a5 !important;
   border-color: #8bc34a !important;
-  colo
+  color: #33691e;
+  text-decoration: line-through;
+}
 
+/* Bloqueado */
+.bloqueado {
+  background-color: #e1bee7;
+  border-color: #ce93d8;
+  color: #8e24aa;
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
