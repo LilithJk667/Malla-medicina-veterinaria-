@@ -165,6 +165,7 @@ function crearMalla() {
 
     container.appendChild(contenedorAnio);
   }
+guardarProgreso();
 
   desbloquearIniciales();
 }
@@ -215,7 +216,36 @@ function aprobarRamo(nombre) {
     }
   }
 }
+// Añadir tooltip si está bloqueado
+div.setAttribute("title", "Requiere prerrequisito");
+function guardarProgreso() {
+  const aprobados = Object.entries(estadoRamos)
+    .filter(([_, info]) => info.aprobado)
+    .map(([nombre]) => nombre);
+  localStorage.setItem("ramosAprobados", JSON.stringify(aprobados));
+}
 
+function cargarProgreso() {
+  const data = localStorage.getItem("ramosAprobados");
+  if (!data) return;
+
+  const aprobados = JSON.parse(data);
+  aprobados.forEach(nombre => {
+    if (estadoRamos[nombre]) {
+      estadoRamos[nombre].aprobado = true;
+      estadoRamos[nombre].elemento.classList.add("aprobado");
+    }
+  });
+
+  // Luego de marcar los aprobados, desbloquear los que correspondan
+  for (const [destino, prereqs] of Object.entries(dependencias)) {
+    const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
+    if (todosAprobados && !estadoRamos[destino].aprobado) {
+      estadoRamos[destino].elemento.classList.remove("bloqueado");
+      estadoRamos[destino].elemento.removeAttribute("title");
+    }
+  }
+}
 crearMalla();
 if (ramo.desbloquea) {
   ramo.desbloquea.forEach(destino => {
@@ -224,5 +254,4 @@ if (ramo.desbloquea) {
   });
 }
 
-// Añadir tooltip si está bloqueado
-div.setAttribute("title", "Requiere prerrequisito");
+cargarProgreso();
