@@ -179,18 +179,50 @@ function desbloquearIniciales() {
 
 function aprobarRamo(nombre) {
   const ramo = estadoRamos[nombre];
-  if (ramo.aprobado) return;
 
+  // Si el ramo está aprobado y lo vuelven a presionar → desmarcar
+  if (ramo.aprobado) {
+    ramo.aprobado = false;
+    ramo.elemento.classList.remove("aprobado");
+
+    // Recalcular todos los ramos que dependían de este
+    for (const [destino, prereqs] of Object.entries(dependencias)) {
+      if (!estadoRamos[destino].aprobado) {
+        const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
+        if (!todosAprobados) {
+          estadoRamos[destino].elemento.classList.add("bloqueado");
+          estadoRamos[destino].elemento.setAttribute("title", "Requiere prerrequisito");
+        }
+      }
+    }
+    return;
+  }
+
+  // Si el ramo está bloqueado, no hacer nada
+  if (ramo.elemento.classList.contains("bloqueado")) return;
+
+  // Aprobar el ramo
   ramo.aprobado = true;
   ramo.elemento.classList.add("aprobado");
 
+  // Desbloquear ramos que dependan de este (si todos sus prereqs están aprobados)
   for (const [destino, prereqs] of Object.entries(dependencias)) {
     if (estadoRamos[destino].aprobado) continue;
     const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
     if (todosAprobados) {
       estadoRamos[destino].elemento.classList.remove("bloqueado");
+      estadoRamos[destino].elemento.removeAttribute("title");
     }
   }
 }
 
 crearMalla();
+if (ramo.desbloquea) {
+  ramo.desbloquea.forEach(destino => {
+    if (!dependencias[destino]) dependencias[destino] = [];
+    dependencias[destino].push(ramo.nombre);
+  });
+}
+
+// Añadir tooltip si está bloqueado
+div.setAttribute("title", "Requiere prerrequisito");
