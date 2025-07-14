@@ -1,117 +1,196 @@
-const cursos = [
-  // Primer Año - Semestre 1
-  { nombre: "Química general", id: "quimica", desbloquea: ["bioquimica"] },
-  { nombre: "Biología celular", id: "biocel", desbloquea: ["histologia"] },
-  { nombre: "Zoología para las ciencias veterinarias", id: "zoologia", desbloquea: ["parasitologia"] },
-  { nombre: "Inglés instrumental I", id: "ingles1", desbloquea: ["ingles2"] },
-  { nombre: "Ecología", id: "ecologia" },
-  { nombre: "Rol del médico veterinario", id: "rolmv" },
+const malla = {
+  "Primer año": {
+    "Semestre 1": [
+      { nombre: "Química general", desbloquea: ["Procesos Bioquímicos"] },
+      { nombre: "Biología celular", desbloquea: ["Histología"] },
+      { nombre: "Zoología para las ciencias veterinarias", desbloquea: ["Parasitología"] },
+      { nombre: "Inglés instrumental I", desbloquea: ["Inglés instrumental II"] },
+      { nombre: "Ecología" },
+      { nombre: "Rol del médico veterinario" }
+    ],
+    "Semestre 2": [
+      { nombre: "Procesos Bioquímicos" },
+      { nombre: "Histología", desbloquea: ["Embriología", "Patología general"] },
+      { nombre: "Anatomía animal I", desbloquea: ["Anatomía animal II"] },
+      { nombre: "Zootecnia", desbloquea: ["Nutrición y alimentación"] },
+      { nombre: "Fundamentos de etología y bienestar animal" },
+      { nombre: "Electivo Elac" }
+    ]
+  },
 
-  // Primer Año - Semestre 2
-  { nombre: "Procesos Bioquímicos", id: "bioquimica", requisitos: ["quimica"] },
-  { nombre: "Histología", id: "histologia", requisitos: ["biocel"], desbloquea: ["embriologia", "patologia"] },
-  { nombre: "Anatomía animal I", id: "anato1", desbloquea: ["anato2"] },
-  { nombre: "Zootecnia", id: "zootecnia", desbloquea: ["nutricion"] },
-  { nombre: "Fundamentos de etología y bienestar animal", id: "etologia" },
-  { nombre: "Electivo Elac", id: "elac" },
+  "Segundo año": {
+    "Semestre 3": [
+      { nombre: "Fisiología animal I", desbloquea: ["Fisiopatología I", "Farmacología"] },
+      { nombre: "Embriología" },
+      { nombre: "Anatomía animal II" },
+      { nombre: "Microbiología general", desbloquea: ["Enfermedades infecciosas"] },
+      { nombre: "Reproducción animal y genética" },
+      { nombre: "Inglés instrumental II" },
+      { nombre: "Electivo EI1" }
+    ],
+    "Semestre 4": [
+      { nombre: "Fisiología animal II", desbloquea: ["Fisiopatología I", "Farmacología"] },
+      { nombre: "Patología general", desbloquea: ["Semiotecnia A+S"] },
+      {
+        nombre: "Nutrición y alimentación",
+        desbloquea: ["Producción bovina", "Producción de aves y cerdos", "Producción de rumiantes menores"]
+      },
+      { nombre: "Epidemiología", desbloquea: ["Gestión ambiental", "Vigilancia epidemiológica", "Tecnología de los alimentos e inocuidad"] },
+      {
+        nombre: "Contexto social para las ciencias veterinarias",
+        desbloquea: ["Negocio y emprendimiento para las ciencias veterinarias", "Desarrollo rural"]
+      },
+      { nombre: "Parasitología" }
+    ]
+  },
 
-  // Segundo Año - Semestre 3
-  { nombre: "Fisiología animal I", id: "fisio1", desbloquea: ["fisio2", "fisiopato1", "farmacologia"] },
-  { nombre: "Embriología", id: "embriologia", requisitos: ["histologia"] },
-  { nombre: "Anatomía animal II", id: "anato2", requisitos: ["anato1"] },
-  { nombre: "Microbiología general", id: "microbio", desbloquea: ["enf_infecciosas"] },
-  { nombre: "Reproducción animal y genética", id: "repro" },
-  { nombre: "Inglés instrumental II", id: "ingles2", requisitos: ["ingles1"] },
-  { nombre: "Electivo EI1", id: "ei1" },
+  "Tercer año": {
+    "Semestre 5": [
+      { nombre: "Fisiopatología I", desbloquea: ["Fisiopatología II"] },
+      { nombre: "Farmacología", desbloquea: ["Anestesiologia y el manejo del dolor"] },
+      {
+        nombre: "Enfermedades infecciosas",
+        desbloquea: ["Medicina De pequeños animales", "Medicina de rumiantes"]
+      },
+      {
+        nombre: "Producción de aves y cerdos",
+        desbloquea: ["Proyecto productivo"]
+      },
+      {
+        nombre: "Producción de rumiantes menores",
+        desbloquea: ["Proyecto productivo"]
+      },
+      {
+        nombre: "Electivo Elte"
+      },
+      {
+        nombre: "Evaluación De ciclo inicial"
+      }
+    ],
+    "Semestre 6": [
+      { nombre: "Fisiopatología II" },
+      { nombre: "Ictiopatología", desbloquea: ["Producción Acuícola"] },
+      { nombre: "Producción bovina", desbloquea: ["Proyecto productivo"] },
+      { nombre: "Negocio y emprendimiento para las ciencias veterinarias", desbloquea: ["Desarrollo rural"] },
+      { nombre: "Semiotecnia A+S", desbloquea: ["Técnicas diagnósticas", "Anestesiologia y el manejo del dolor"] },
+      { nombre: "Electivo EI2" }
+    ]
+  },
 
-  // Segundo Año - Semestre 4
-  { nombre: "Fisiología animal II", id: "fisio2", requisitos: ["fisio1"], desbloquea: ["fisiopato1", "farmacologia"] },
-  { nombre: "Patología general", id: "patologia", requisitos: ["histologia"], desbloquea: ["semiotecnia"] },
-  { nombre: "Nutrición y alimentación", id: "nutricion", requisitos: ["zootecnia"], desbloquea: ["prod_bovina", "prod_aves_cerdos", "prod_rumiantes"] },
-  { nombre: "Epidemiología", id: "epidemiologia", desbloquea: ["gestion_ambiental", "vigilancia"] },
-  { nombre: "Contexto social para las ciencias veterinarias", id: "contexto", desbloquea: ["negocios", "rural"] },
-  { nombre: "Parasitología", id: "parasitologia", requisitos: ["zoologia"] },
+  "Cuarto año": {
+    "Semestre 7": [
+      { nombre: "Medicina De pequeños animales", desbloquea: ["Internado pequeños animales I"] },
+      { nombre: "Técnicas diagnósticas" },
+      { nombre: "Anestesiologia y el manejo del dolor", desbloquea: ["Cirugía I"] },
+      { nombre: "Producción Acuícola", desbloquea: ["Proyecto productivo"] },
+      { nombre: "Vigilancia epidemiológica", desbloquea: ["Salud pública", "Medicina de conservación"] },
+      { nombre: "Gestión ambiental" }
+    ],
+    "Semestre 8": [
+      { nombre: "Medicina de rumiantes", desbloquea: ["Internado animales mayores I"] },
+      { nombre: "Medicina de equinos", desbloquea: ["Internado animales mayores I"] },
+      { nombre: "Cirugía I", desbloquea: ["Cirugía II"] },
+      { nombre: "Metodología de la investigación" },
+      { nombre: "Tecnología de los alimentos e inocuidad" },
+      { nombre: "Electivo disciplinar I" }
+    ]
+  },
 
-  // Tercer Año - Semestre 5
-  { nombre: "Fisiopatología I", id: "fisiopato1", requisitos: ["fisio1", "fisio2"], desbloquea: ["fisiopato2"] },
-  { nombre: "Farmacología", id: "farmacologia", requisitos: ["fisio1", "fisio2"], desbloquea: ["anestesia"] },
-  { nombre: "Enfermedades infecciosas", id: "enf_infecciosas", requisitos: ["microbio"], desbloquea: ["med_pequenos", "med_rumiantes"] },
-  { nombre: "Producción de aves y cerdos", id: "prod_aves_cerdos", requisitos: ["nutricion"], desbloquea: ["proyecto"] },
-  { nombre: "Producción de rumiantes menores", id: "prod_rumiantes", requisitos: ["nutricion"], desbloquea: ["proyecto"] },
-  { nombre: "Electivo Elte", id: "elte" },
-  { nombre: "Evaluación ciclo inicial", id: "eval_ini", requisitos: ["quimica","biocel","zoologia","ingles1","ecologia","rolmv","bioquimica","histologia","anato1","zootecnia","etologia","elac","fisio1","embriologia","anato2","microbio","repro","ingles2","ei1","fisio2","patologia","nutricion","epidemiologia","contexto","parasitologia"] },
+  "Quinto año": {
+    "Semestre 9": [
+      { nombre: "Internado pequeños animales I", desbloquea: ["Internado pequeños animales II"] },
+      { nombre: "Proyecto productivo" },
+      { nombre: "Internado animales mayores I", desbloquea: ["Internado animales mayores II"] },
+      { nombre: "Cirugía II" },
+      { nombre: "Desarrollo rural" },
+      { nombre: "Electivo EI3" }
+    ],
+    "Semestre 10": [
+      { nombre: "Internado pequeños animales II" },
+      { nombre: "Internado animales mayores II" },
+      { nombre: "Salud pública" },
+      { nombre: "Medicina de conservación" },
+      { nombre: "Ética profesional" },
+      { nombre: "Electivo disciplinar II" }
+    ]
+  }
+};
 
-  // Tercer Año - Semestre 6
-  { nombre: "Fisiopatología II", id: "fisiopato2", requisitos: ["fisiopato1"] },
-  { nombre: "Ictiopatología", id: "ictio", desbloquea: ["acuicola"] },
-  { nombre: "Producción bovina", id: "prod_bovina", requisitos: ["nutricion"], desbloquea: ["proyecto"] },
-  { nombre: "Negocio y emprendimiento", id: "negocios", requisitos: ["contexto"], desbloquea: ["rural"] },
-  { nombre: "Semiotecnia A+S", id: "semiotecnia", requisitos: ["patologia"], desbloquea: ["tecnicas_diag", "anestesia"] },
-  { nombre: "Electivo EI2", id: "ei2" },
+const estadoRamos = {};
+const dependencias = {};
 
-  // Cuarto Año - Semestre 7
-  { nombre: "Medicina De pequeños animales", id: "med_pequenos", requisitos: ["enf_infecciosas"], desbloquea: ["int_peq1"] },
-  { nombre: "Técnicas diagnósticas", id: "tecnicas_diag", requisitos: ["semiotecnia"] },
-  { nombre: "Anestesiologia y manejo del dolor", id: "anestesia", requisitos: ["farmacologia", "semiotecnia"], desbloquea: ["cirugia1"] },
-  { nombre: "Producción Acuícola", id: "acuicola", requisitos: ["ictio"], desbloquea: ["proyecto"] },
-  { nombre: "Vigilancia epidemiológica", id: "vigilancia", requisitos: ["epidemiologia"], desbloquea: ["salud_pub", "conservacion"] },
-  { nombre: "Gestión ambiental", id: "gestion_ambiental", requisitos: ["epidemiologia"] },
-
-  // Cuarto Año - Semestre 8
-  { nombre: "Medicina de rumiantes", id: "med_rumiantes", requisitos: ["enf_infecciosas"], desbloquea: ["int_may1"] },
-  { nombre: "Medicina de equinos", id: "equinos", desbloquea: ["int_may1"] },
-  { nombre: "Cirugía I", id: "cirugia1", requisitos: ["anestesia"], desbloquea: ["cirugia2"] },
-  { nombre: "Metodología de la investigación", id: "metodo", requisitos: ["tecnicas_diag", "anestesia", "med_pequenos", "acuicola", "vigilancia", "gestion_ambiental"] },
-  { nombre: "Tecnología de los alimentos e inocuidad", id: "inocuidad", requisitos: ["epidemiologia", "prod_bovina"] },
-  { nombre: "Electivo disciplinar I", id: "disc1", requisitos: ["eval_ini"] },
-
-  // Quinto Año - Semestre 9
-  { nombre: "Internado pequeños animales I", id: "int_peq1", requisitos: ["med_pequenos"], desbloquea: ["int_peq2"] },
-  { nombre: "Proyecto productivo", id: "proyecto", requisitos: ["prod_bovina", "prod_aves_cerdos", "prod_rumiantes", "acuicola"] },
-  { nombre: "Internado animales mayores I", id: "int_may1", requisitos: ["med_rumiantes", "equinos"], desbloquea: ["int_may2"] },
-  { nombre: "Cirugía II", id: "cirugia2", requisitos: ["cirugia1"] },
-  { nombre: "Desarrollo rural", id: "rural", requisitos: ["contexto", "negocios"] },
-  { nombre: "Electivo EI3", id: "ei3" },
-
-  // Quinto Año - Semestre 10
-  { nombre: "Internado pequeños animales II", id: "int_peq2", requisitos: ["int_peq1"] },
-  { nombre: "Internado animales mayores II", id: "int_may2", requisitos: ["int_may1"] },
-  { nombre: "Salud pública", id: "salud_pub", requisitos: ["vigilancia"] },
-  { nombre: "Medicina de conservación", id: "conservacion", requisitos: ["vigilancia"] },
-  { nombre: "Ética profesional", id: "etica" },
-  { nombre: "Electivo disciplinar II", id: "disc2", requisitos: ["eval_ini"] }
-];
+const container = document.getElementById("malla");
 
 function crearMalla() {
-  const malla = document.getElementById("malla");
-  cursos.forEach(curso => {
-    const div = document.createElement("div");
-    div.classList.add("ramo");
-    if (curso.requisitos && curso.requisitos.length > 0) {
-      div.classList.add("bloqueado");
+  for (const [anio, semestres] of Object.entries(malla)) {
+    const contenedorAnio = document.createElement("div");
+    contenedorAnio.className = "anio";
+
+    const tituloAnio = document.createElement("h2");
+    tituloAnio.textContent = anio;
+    contenedorAnio.appendChild(tituloAnio);
+
+    for (const [semestre, ramos] of Object.entries(semestres)) {
+      const contenedorSemestre = document.createElement("div");
+      contenedorSemestre.className = "semestre";
+
+      const tituloSemestre = document.createElement("h3");
+      tituloSemestre.textContent = semestre;
+      contenedorSemestre.appendChild(tituloSemestre);
+
+      const contenedorRamos = document.createElement("div");
+      contenedorRamos.className = "ramos";
+
+      ramos.forEach(ramo => {
+        const div = document.createElement("div");
+        div.className = "ramo bloqueado";
+        div.textContent = ramo.nombre;
+        div.dataset.nombre = ramo.nombre;
+
+        estadoRamos[ramo.nombre] = { aprobado: false, elemento: div };
+        if (ramo.desbloquea) {
+          ramo.desbloquea.forEach(destino => {
+            if (!dependencias[destino]) dependencias[destino] = [];
+            dependencias[destino].push(ramo.nombre);
+          });
+        }
+
+        div.addEventListener("click", () => aprobarRamo(ramo.nombre));
+        contenedorRamos.appendChild(div);
+      });
+
+      contenedorSemestre.appendChild(contenedorRamos);
+      contenedorAnio.appendChild(contenedorSemestre);
     }
-    div.id = curso.id;
-    div.innerText = curso.nombre;
-    div.onclick = () => aprobarCurso(curso.id);
-    malla.appendChild(div);
-  });
+
+    container.appendChild(contenedorAnio);
+  }
+
+  desbloquearIniciales();
 }
 
-function aprobarCurso(id) {
-  const curso = cursos.find(c => c.id === id);
-  const div = document.getElementById(id);
-  if (div.classList.contains("bloqueado") || div.classList.contains("aprobado")) return;
-
-  div.classList.add("aprobado");
-
-  cursos.forEach(c => {
-    if (c.requisitos && c.requisitos.includes(id)) {
-      if (c.requisitos.every(req => document.getElementById(req).classList.contains("aprobado"))) {
-        document.getElementById(c.id).classList.remove("bloqueado");
-      }
+function desbloquearIniciales() {
+  for (const nombre in estadoRamos) {
+    if (!dependencias[nombre]) {
+      estadoRamos[nombre].elemento.classList.remove("bloqueado");
     }
-  });
+  }
 }
 
-window.onload = crearMalla;
+function aprobarRamo(nombre) {
+  const ramo = estadoRamos[nombre];
+  if (ramo.aprobado) return;
 
+  ramo.aprobado = true;
+  ramo.elemento.classList.add("aprobado");
+
+  for (const [destino, prereqs] of Object.entries(dependencias)) {
+    if (estadoRamos[destino].aprobado) continue;
+    const todosAprobados = prereqs.every(p => estadoRamos[p].aprobado);
+    if (todosAprobados) {
+      estadoRamos[destino].elemento.classList.remove("bloqueado");
+    }
+  }
+}
+
+crearMalla();
